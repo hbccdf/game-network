@@ -1,4 +1,9 @@
 package network.protocol.codec;
 
-public interface IProtocolCodecFactory {
+import io.netty.channel.socket.SocketChannel;
+
+public interface IProtocolCodecFactory<T> {
+    IProtocolEncoder GetEncoder(SocketChannel channel);
+
+    IProtocolDecoder<T> GetDecoder(SocketChannel channel);
 }
