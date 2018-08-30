@@ -1,4 +1,20 @@
 package network.protocol.codec;
 
-public class SimpleProtocolEncoder {
+import io.netty.buffer.ByteBuf;
+import network.protocol.SimpleMessage;
+
+public class SimpleProtocolEncoder implements IProtocolEncoder {
+    @Override
+    public void encode(Object msg, ByteBuf out) {
+        if (msg == null || !(msg instanceof SimpleMessage)) {
+            return;
+        }
+
+        SimpleMessage message = (SimpleMessage)msg;
+
+        out.writeInt(message.getCmdId());
+
+        out.writeInt(message.getData().length);
+        out.writeBytes(message.getData());
+    }
 }
