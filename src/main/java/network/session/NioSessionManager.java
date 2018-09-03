@@ -4,6 +4,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class NioSessionManager implements ISessionManager {
     private ConcurrentHashMap<Integer, ISession> idToSessionMap;
+
     @Override
     public ISession getSession(int sessionId) {
         return idToSessionMap.get(sessionId);
@@ -44,6 +45,10 @@ public class NioSessionManager implements ISessionManager {
         return sessionsCount;
     }
 
+    @Override
+    public void release() {
+        idToSessionMap.clear();
+    }
 
     private ISession[] getSessions(int[] sessionIds) {
         ISession[] sessions = new ISession[sessionIds.length];

@@ -9,4 +9,6 @@ public interface ISessionManager {
     boolean sendMsg(int sessionId, Object obj);
 
     int broadcastMsg(int[] sessionsIds, Object obj);
+
+    void release();
 }
