@@ -1,9 +1,12 @@
 package network.session;
 
+import io.netty.channel.ChannelId;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 public class NioSessionManager implements ISessionManager {
-    private ConcurrentHashMap<Integer, ISession> idToSessionMap;
+    private ConcurrentHashMap<Integer, ISession> idToSessionMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<ChannelId, ISession> channelIdToSessionMap = new ConcurrentHashMap<>();
 
     @Override
     public ISession getSession(int sessionId) {
@@ -11,15 +14,24 @@ public class NioSessionManager implements ISessionManager {
     }
 
     @Override
+    public ISession getSessionByChannelId(Object channelId) {
+        return channelIdToSessionMap.get(channelId);
+    }
+
+    @Override
     public void addSession(ISession session) {
         if (session != null) {
             idToSessionMap.put(session.getId(), session);
+            channelIdToSessionMap.put((ChannelId) session.getChannelId(), session);
         }
     }
 
     @Override
     public void releaseSession(int sessionId) {
-        idToSessionMap.remove(sessionId);
+        ISession session = idToSessionMap.remove(sessionId);
+        if (session != null) {
+            channelIdToSessionMap.remove((ChannelId) session.getChannelId(), session);
+        }
     }
 
     @Override
@@ -48,6 +60,7 @@ public class NioSessionManager implements ISessionManager {
     @Override
     public void release() {
         idToSessionMap.clear();
+        channelIdToSessionMap.clear();;
     }
 
     private ISession[] getSessions(int[] sessionIds) {
