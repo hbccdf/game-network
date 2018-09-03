@@ -10,6 +10,13 @@ public class NioSessionManager implements ISessionManager {
     }
 
     @Override
+    public void addSession(ISession session) {
+        if (session != null) {
+            idToSessionMap.put(session.getId(), session);
+        }
+    }
+
+    @Override
     public void releaseSession(int sessionId) {
         idToSessionMap.remove(sessionId);
     }
