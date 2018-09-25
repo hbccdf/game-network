@@ -1,10 +1,14 @@
 package network.session;
 
 import io.netty.channel.ChannelId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 public class NioSessionManager implements ISessionManager {
+    private static Logger logger = LoggerFactory.getLogger(NioSessionManager.class);
+
     private ConcurrentHashMap<Integer, ISession> idToSessionMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<ChannelId, ISession> channelIdToSessionMap = new ConcurrentHashMap<>();
 
@@ -23,6 +27,7 @@ public class NioSessionManager implements ISessionManager {
         if (session != null) {
             idToSessionMap.put(session.getId(), session);
             channelIdToSessionMap.put((ChannelId) session.getChannelId(), session);
+            logger.info("add session {}, current session count {}", session.getId(), idToSessionMap.size());
         }
     }
 
@@ -32,6 +37,7 @@ public class NioSessionManager implements ISessionManager {
         if (session != null) {
             channelIdToSessionMap.remove((ChannelId) session.getChannelId(), session);
         }
+        logger.info("remove session {}, result {}, current session count {}", sessionId, session != null, idToSessionMap.size());
     }
 
     @Override
