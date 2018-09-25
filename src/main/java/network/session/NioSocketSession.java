@@ -4,6 +4,7 @@ import io.netty.channel.Channel;
 
 public class NioSocketSession implements ISession {
     private int connId;
+    private int userId;
     private Channel channel;
     public NioSocketSession(Channel channel, int connId) {
         this.channel = channel;
@@ -13,6 +14,16 @@ public class NioSocketSession implements ISession {
     @Override
     public int getId() {
         return connId;
+    }
+
+    @Override
+    public int getUserId() {
+        return userId;
+    }
+
+    @Override
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     @Override

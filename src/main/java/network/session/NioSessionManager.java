@@ -5,12 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class NioSessionManager implements ISessionManager {
     private static Logger logger = LoggerFactory.getLogger(NioSessionManager.class);
 
     private ConcurrentHashMap<Integer, ISession> idToSessionMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<ChannelId, ISession> channelIdToSessionMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer, ISession> userIdToSessionMap = new ConcurrentHashMap<>();
 
     @Override
     public ISession getSession(int sessionId) {
@@ -20,6 +22,11 @@ public class NioSessionManager implements ISessionManager {
     @Override
     public ISession getSessionByChannelId(Object channelId) {
         return channelIdToSessionMap.get(channelId);
+    }
+
+    @Override
+    public ISession getSessionByUserId(int userId) {
+        return userIdToSessionMap.get(userId);
     }
 
     @Override
@@ -36,8 +43,26 @@ public class NioSessionManager implements ISessionManager {
         ISession session = idToSessionMap.remove(sessionId);
         if (session != null) {
             channelIdToSessionMap.remove((ChannelId) session.getChannelId(), session);
+            int userId = session.getUserId();
+            userIdToSessionMap.remove(userId);
         }
         logger.info("remove session {}, result {}, current session count {}", sessionId, session != null, idToSessionMap.size());
+    }
+
+    @Override
+    public boolean setUserId(int sessionId, int userId) {
+        ISession session = getSession(sessionId);
+        if (session == null) {
+            return false;
+        }
+
+        ISession userSession = getSessionByUserId(userId);
+        if (userSession != null) {
+            return false;
+        }
+
+        userIdToSessionMap.put(userId, session);
+        return true;
     }
 
     @Override
@@ -66,7 +91,8 @@ public class NioSessionManager implements ISessionManager {
     @Override
     public void release() {
         idToSessionMap.clear();
-        channelIdToSessionMap.clear();;
+        channelIdToSessionMap.clear();
+        userIdToSessionMap.clear();
     }
 
     private ISession[] getSessions(int[] sessionIds) {
