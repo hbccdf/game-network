@@ -61,6 +61,7 @@ public class NioSessionManager implements ISessionManager {
             return false;
         }
 
+        session.setUserId(userId);
         userIdToSessionMap.put(userId, session);
         return true;
     }
