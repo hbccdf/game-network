@@ -9,7 +9,9 @@ public interface ISessionManager {
     void addSession(ISession session);
     void releaseSession(int sessionId);
 
-    boolean setUserId(int sessionId, int userId);
+    boolean login(int sessionId, int userId);
+
+    boolean logout(int sessionId);
 
     boolean sendMsg(int sessionId, Object obj);
     int broadcastMsg(int[] sessionsIds, Object obj);

@@ -50,7 +50,7 @@ public class NioSessionManager implements ISessionManager {
     }
 
     @Override
-    public boolean setUserId(int sessionId, int userId) {
+    public boolean login(int sessionId, int userId) {
         ISession session = getSession(sessionId);
         if (session == null) {
             return false;
@@ -63,6 +63,19 @@ public class NioSessionManager implements ISessionManager {
 
         session.setUserId(userId);
         userIdToSessionMap.put(userId, session);
+        return true;
+    }
+
+    @Override
+    public boolean logout(int sessionId) {
+        ISession session = getSession(sessionId);
+        if (session == null) {
+            return false;
+        }
+
+        int userId = session.getUserId();
+        session.setUserId(0);
+        userIdToSessionMap.remove(userId);
         return true;
     }
 
