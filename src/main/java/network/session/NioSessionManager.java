@@ -4,6 +4,7 @@ import io.netty.channel.ChannelId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -43,7 +44,7 @@ public class NioSessionManager implements ISessionManager {
         ISession session = idToSessionMap.remove(sessionId);
         if (session != null) {
             channelIdToSessionMap.remove((ChannelId) session.getChannelId(), session);
-            int userId = session.getUserId();
+            int userId = session.logout();
             userIdToSessionMap.remove(userId);
         }
         logger.info("remove session {}, result {}, current session count {}", sessionId, session != null, idToSessionMap.size());
@@ -61,7 +62,7 @@ public class NioSessionManager implements ISessionManager {
             return false;
         }
 
-        session.setUserId(userId);
+        session.login(userId);
         userIdToSessionMap.put(userId, session);
         return true;
     }
@@ -73,9 +74,10 @@ public class NioSessionManager implements ISessionManager {
             return false;
         }
 
-        int userId = session.getUserId();
-        session.setUserId(0);
-        userIdToSessionMap.remove(userId);
+        int userId = session.logout();
+        if (userId > 0) {
+            userIdToSessionMap.remove(userId);
+        }
         return true;
     }
 

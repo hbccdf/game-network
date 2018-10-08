@@ -1,13 +1,19 @@
 package network.session;
 
+import java.util.Date;
+
 public interface ISession {
     int getId();
 
     int getUserId();
 
-    void setUserId(int userId);
+    Date getLoginTime();
 
     Object getChannelId();
+
+    void login(int userId);
+
+    int logout();
 
     void write(Object obj);
 }
