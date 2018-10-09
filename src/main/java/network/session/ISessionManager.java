@@ -13,6 +13,8 @@ public interface ISessionManager {
 
     boolean logout(int sessionId);
 
+    int getUserId(int sessionId);
+
     boolean sendMsg(int sessionId, Object obj);
     int broadcastMsg(int[] sessionsIds, Object obj);
 

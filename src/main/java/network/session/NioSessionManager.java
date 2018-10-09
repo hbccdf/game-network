@@ -82,6 +82,16 @@ public class NioSessionManager implements ISessionManager {
     }
 
     @Override
+    public int getUserId(int sessionId) {
+        ISession session = getSession(sessionId);
+        if (session == null) {
+            return -1;
+        }
+
+        return session.getUserId();
+    }
+
+    @Override
     public boolean sendMsg(int sessionId, Object obj) {
         ISession session = getSession(sessionId);
         if (session != null) {
