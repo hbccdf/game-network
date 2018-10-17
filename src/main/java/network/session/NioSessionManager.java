@@ -121,6 +121,11 @@ public class NioSessionManager implements ISessionManager {
         userIdToSessionMap.clear();
     }
 
+    @Override
+    public int size() {
+        return channelIdToSessionMap.size();
+    }
+
     private ISession[] getSessions(int[] sessionIds) {
         ISession[] sessions = new ISession[sessionIds.length];
         for (int i = 0; i < sessionIds.length; ++i) {

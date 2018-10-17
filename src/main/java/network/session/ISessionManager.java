@@ -19,4 +19,6 @@ public interface ISessionManager {
     int broadcastMsg(int[] sessionsIds, Object obj);
 
     void release();
+
+    int size();
 }
