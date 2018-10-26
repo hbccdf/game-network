@@ -10,12 +10,12 @@ public class InternalProtocolCodecFactory implements IProtocolCodecFactory<Inter
     }
 
     @Override
-    public IProtocolEncoder GetEncoder(SocketChannel channel) {
+    public IProtocolEncoder getEncoder(SocketChannel channel) {
         return new InternalProtocolEncoder();
     }
 
     @Override
-    public IProtocolDecoder<InternalMessage> GetDecoder(SocketChannel channel) {
+    public IProtocolDecoder<InternalMessage> getDecoder(SocketChannel channel) {
         return new InternalProtocolDecoder();
     }
 }

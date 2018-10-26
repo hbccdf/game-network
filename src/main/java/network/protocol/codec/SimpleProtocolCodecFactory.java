@@ -5,12 +5,12 @@ import network.protocol.SimpleMessage;
 
 public class SimpleProtocolCodecFactory implements IProtocolCodecFactory<SimpleMessage> {
     @Override
-    public IProtocolEncoder GetEncoder(SocketChannel channel) {
+    public IProtocolEncoder getEncoder(SocketChannel channel) {
         return new SimpleProtocolEncoder();
     }
 
     @Override
-    public IProtocolDecoder<SimpleMessage> GetDecoder(SocketChannel channel) {
+    public IProtocolDecoder<SimpleMessage> getDecoder(SocketChannel channel) {
         return new SimpleProtocolDecoder();
     }
 }

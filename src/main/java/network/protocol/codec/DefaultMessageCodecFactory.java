@@ -10,12 +10,12 @@ public class DefaultMessageCodecFactory implements IProtocolCodecFactory<Default
 
     }
     @Override
-    public IProtocolEncoder GetEncoder(SocketChannel channel) {
+    public IProtocolEncoder getEncoder(SocketChannel channel) {
         return new DefaultMessageEncoder();
     }
 
     @Override
-    public IProtocolDecoder<DefaultMessage> GetDecoder(SocketChannel channel) {
+    public IProtocolDecoder<DefaultMessage> getDecoder(SocketChannel channel) {
         return new DefaultMessageDecoder();
     }
 }

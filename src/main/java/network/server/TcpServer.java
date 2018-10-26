@@ -49,8 +49,8 @@ public class TcpServer<T> {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline p = ch.pipeline();
-                            p.addLast(new CytxFrameEncoder(codecFactory.GetEncoder(ch)));
-                            p.addLast(new CytxFrameDecoder<T>(codecFactory.GetDecoder(ch)));
+                            p.addLast(new CytxFrameEncoder(codecFactory.getEncoder(ch)));
+                            p.addLast(new CytxFrameDecoder<T>(codecFactory.getDecoder(ch)));
                             p.addLast(new CytxHandler<T>(handler));
                         }
                     })

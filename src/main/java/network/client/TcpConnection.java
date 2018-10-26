@@ -40,8 +40,8 @@ public class TcpConnection<T> {
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline p = ch.pipeline();
-                        p.addLast(new CytxFrameEncoder(codecFactory.GetEncoder(ch)));
-                        p.addLast(new CytxFrameDecoder<>(codecFactory.GetDecoder(ch)));
+                        p.addLast(new CytxFrameEncoder(codecFactory.getEncoder(ch)));
+                        p.addLast(new CytxFrameDecoder<>(codecFactory.getDecoder(ch)));
                         p.addLast(new CytxHandler<>(handler));
                     }
                 })
