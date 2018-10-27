@@ -26,9 +26,10 @@ public class CytxHandler<T> extends ChannelInboundHandlerAdapter {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (handler != null) {
-            handler.messageReceived(ctx, (T)msg);
+            handler.messageReceived(ctx, ((T) msg));
         }
     }
 
