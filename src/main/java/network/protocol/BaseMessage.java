@@ -31,6 +31,11 @@ public abstract class BaseMessage<T extends BaseMessageHeader> implements IMessa
     }
 
     @Override
+    public int getTotalLength() {
+        return header.getLength() + 4 + (data == null ? 0 : data.length);
+    }
+
+    @Override
     public String toString() {
         return String.format("baseMsg[header=%s, data=%s]", header, Arrays.toString(data));
     }

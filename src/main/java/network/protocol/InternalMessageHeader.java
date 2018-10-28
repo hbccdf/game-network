@@ -42,4 +42,9 @@ public class InternalMessageHeader extends BaseMessageHeader{
     public void setSeqId(int seqId) {
         this.seqId = seqId;
     }
+
+    @Override
+    public int getLength() {
+        return 12;
+    }
 }

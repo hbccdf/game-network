@@ -1,5 +1,7 @@
 package network.session;
 
+import java.util.Collection;
+
 public interface ISessionManager {
     ISession getSession(int sessionId);
     ISession getSessionByChannelId(Object channelId);
@@ -21,4 +23,7 @@ public interface ISessionManager {
     void release();
 
     int size();
+
+    Collection<ISession> getSessions();
+
 }

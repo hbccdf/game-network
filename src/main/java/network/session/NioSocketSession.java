@@ -1,7 +1,9 @@
 package network.session;
 
 import io.netty.channel.Channel;
+import network.protocol.IMessage;
 
+import java.net.InetSocketAddress;
 import java.util.Date;
 
 public class NioSocketSession implements ISession {
@@ -9,9 +11,14 @@ public class NioSocketSession implements ISession {
     private int userId;
     private Date loginTime;
     private Channel channel;
+    private Date createTime;
+    int recvBytes = 0;
+    int sendBytes = 0;
+
     public NioSocketSession(Channel channel, int connId) {
         this.channel = channel;
         this.connId = connId;
+        this.createTime = new Date();
     }
 
     @Override
@@ -24,6 +31,10 @@ public class NioSocketSession implements ISession {
         return userId;
     }
 
+    @Override
+    public Date getCreateTime() {
+        return createTime;
+    }
 
     @Override
     public Date getLoginTime() {
@@ -33,6 +44,22 @@ public class NioSocketSession implements ISession {
     @Override
     public Object getChannelId() {
         return channel.id();
+    }
+
+    @Override
+    public int getRecvBytes() {
+        return recvBytes;
+    }
+
+    @Override
+    public int getSendBytes() {
+        return sendBytes;
+    }
+
+    @Override
+    public String getAddressInfo() {
+        InetSocketAddress addr = ((InetSocketAddress) channel.remoteAddress());
+        return String.format("%s:%d", addr.getAddress().getHostAddress(), addr.getPort());
     }
 
     @Override
@@ -50,7 +77,20 @@ public class NioSocketSession implements ISession {
     }
 
     @Override
+    public void onRecv(Object obj) {
+        if (obj instanceof IMessage) {
+            IMessage msg = (IMessage)obj;
+            this.recvBytes += msg.getTotalLength();
+        }
+    }
+
+    @Override
     public void write(Object obj) {
         channel.writeAndFlush(obj);
+
+        if (obj instanceof IMessage) {
+            IMessage msg = (IMessage)obj;
+            this.sendBytes += msg.getTotalLength();
+        }
     }
 }

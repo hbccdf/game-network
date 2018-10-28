@@ -4,6 +4,7 @@ import io.netty.channel.ChannelId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -124,6 +125,11 @@ public class NioSessionManager implements ISessionManager {
     @Override
     public int size() {
         return channelIdToSessionMap.size();
+    }
+
+    @Override
+    public Collection<ISession> getSessions() {
+        return channelIdToSessionMap.values();
     }
 
     private ISession[] getSessions(int[] sessionIds) {
