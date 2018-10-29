@@ -19,6 +19,8 @@ public interface ISession {
 
     String getAddressInfo();
 
+    long getLastRecvTimestamp();
+
     void login(int userId);
 
     int logout();
@@ -26,4 +28,6 @@ public interface ISession {
     void onRecv(Object obj);
 
     void write(Object obj);
+
+    void close();
 }
