@@ -12,8 +12,8 @@ public class NioSocketSession implements ISession {
     private Date loginTime;
     private Channel channel;
     private Date createTime;
-    int recvBytes = 0;
-    int sendBytes = 0;
+    long recvBytes = 0;
+    long sendBytes = 0;
 
     public NioSocketSession(Channel channel, int connId) {
         this.channel = channel;
@@ -47,12 +47,12 @@ public class NioSocketSession implements ISession {
     }
 
     @Override
-    public int getRecvBytes() {
+    public long getRecvBytes() {
         return recvBytes;
     }
 
     @Override
-    public int getSendBytes() {
+    public long getSendBytes() {
         return sendBytes;
     }
 

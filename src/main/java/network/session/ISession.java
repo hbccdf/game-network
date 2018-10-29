@@ -13,9 +13,9 @@ public interface ISession {
 
     Object getChannelId();
 
-    int getRecvBytes();
+    long getRecvBytes();
 
-    int getSendBytes();
+    long getSendBytes();
 
     String getAddressInfo();
 
