@@ -37,7 +37,7 @@ public class TcpServer<T> {
 
     public void start() throws Exception{
         new Thread(()->{
-            EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+            EventLoopGroup bossGroup = new NioEventLoopGroup(4);
             EventLoopGroup workGroup = new NioEventLoopGroup(nThreads);
             try {
                 ServerBootstrap b = new ServerBootstrap();

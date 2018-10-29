@@ -105,10 +105,7 @@ public class NioSocketSession implements ISession {
     @Override
     public void close() {
         lastRecvTime = 0;
-        if (channel.isOpen()) {
-            if (channel.isActive()) {
-                channel.disconnect();
-            }
+        if (channel != null) {
             channel.close();
         }
     }
