@@ -12,6 +12,7 @@ public class NioSocketSession implements ISession {
     private Date loginTime;
     private Channel channel;
     private Date createTime;
+    private long lastRecvTime = System.currentTimeMillis();
     long recvBytes = 0;
     long sendBytes = 0;
 
@@ -63,6 +64,11 @@ public class NioSocketSession implements ISession {
     }
 
     @Override
+    public long getLastRecvTimestamp() {
+        return lastRecvTime;
+    }
+
+    @Override
     public void login(int userId) {
         this.userId = userId;
         this.loginTime = new Date();
@@ -78,6 +84,8 @@ public class NioSocketSession implements ISession {
 
     @Override
     public void onRecv(Object obj) {
+        lastRecvTime = System.currentTimeMillis();
+
         if (obj instanceof IMessage) {
             IMessage msg = (IMessage)obj;
             this.recvBytes += msg.getTotalLength();
@@ -91,6 +99,17 @@ public class NioSocketSession implements ISession {
         if (obj instanceof IMessage) {
             IMessage msg = (IMessage)obj;
             this.sendBytes += msg.getTotalLength();
+        }
+    }
+
+    @Override
+    public void close() {
+        lastRecvTime = 0;
+        if (channel.isOpen()) {
+            if (channel.isActive()) {
+                channel.disconnect();
+            }
+            channel.close();
         }
     }
 }
