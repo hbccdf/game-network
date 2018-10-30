@@ -1,6 +1,5 @@
 package network.client;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -26,7 +25,7 @@ public abstract class BaseFuture<T> implements Future<T> {
         return isDone;
     }
 
-    public void wait(long timeout, TimeUnit unit)  throws InterruptedException, ExecutionException, TimeoutException {
+    public void wait(long timeout, TimeUnit unit)  throws InterruptedException, TimeoutException {
         if (!isDone) {
             synchronized (lock) {
                 try {

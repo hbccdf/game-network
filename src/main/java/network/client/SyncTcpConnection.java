@@ -7,6 +7,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import network.protocol.DefaultMessage;
+import network.protocol.ProtocolManager;
 import network.protocol.codec.CytxFrameDecoder;
 import network.protocol.codec.CytxFrameEncoder;
 import network.protocol.codec.DefaultMessageCodecFactory;
@@ -17,7 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -26,18 +26,20 @@ public class SyncTcpConnection {
 
     private String ip;
     private int port;
+    private IProtocolWriteFutureFactory factory;
 
     //ms
     private static final int DEFAULT_TIME_OUT = 60000;
-    private ConcurrentHashMap<Integer, List<WriteFuture<?>>> requests;
+    private ConcurrentHashMap<Integer, List<BaseWriteFuture<?>>> requests;
     private Bootstrap bootstrap;
     private Channel channel;
 
     private ConnectFuture connectFuture;
 
-    public SyncTcpConnection(String ip, int port) {
+    public SyncTcpConnection(String ip, int port, IProtocolWriteFutureFactory factory) {
         this.ip = ip;
         this.port = port;
+        this.factory = factory;
         requests = new ConcurrentHashMap<>();
 
         new DefaultEventExecutorGroup(1).next().scheduleAtFixedRate(new ClearExpiredFuture(), 0, 1, TimeUnit.MINUTES);
@@ -73,22 +75,13 @@ public class SyncTcpConnection {
         return true;
     }
 
-    public boolean connect() throws ExecutionException, InterruptedException {
+    public boolean connect() throws InterruptedException {
         return connectAsync().get().booleanValue();
     }
 
     public ConnectFuture connectAsync() {
         return connectFuture;
     }
-
-//    public boolean reconnect() throws ExecutionException, InterruptedException {
-//        if (!connectFuture.isDone()) {
-//            return connect();
-//        } else if (isValidate()) {
-//            return true;
-//        } else {
-//        }
-//    }
 
     public void close() throws Exception{
         if(channel != null){
@@ -101,6 +94,10 @@ public class SyncTcpConnection {
         }
     }
 
+    public String getAddress() {
+        return ip + ":" + port;
+    }
+
     public boolean isValidate() {
         if (this.channel != null) {
             return this.channel.isActive();
@@ -108,20 +105,43 @@ public class SyncTcpConnection {
         return false;
     }
 
-    public <T> T write(DefaultMessage msg, IResultHandler<T> handler){
+//    public <T> T write(DefaultMessage msg, IResultHandler<T> handler){
+//        try {
+//            Future<T> future = writeAsync(msg, handler);
+//            return future.get(DEFAULT_TIME_OUT, TimeUnit.MILLISECONDS);
+//        } catch (Exception e) {
+//            logger.error("{}", msg, e);
+//        } finally{
+//        }
+//        return null;
+//    }
+//    public <T> Future<T> writeAsync(DefaultMessage msg, IResultHandler<T> handler){
+//        try {
+//            WriteFuture<T> future = new WriteFuture<>(handler);
+//            addFuture(msg.getCmdId(), future);
+//            write0(msg);
+//            return future;
+//        } catch (Exception e) {
+//            logger.error("", msg, e);
+//        }
+//        return null;
+//    }
+
+    public <T> T write(DefaultMessage msg, Class<T> clz) {
         try {
-            Future<T> future = writeAsync(msg, handler);
-            return future.get(DEFAULT_TIME_OUT, TimeUnit.MILLISECONDS);
+            Future<T> future = writeAsync(msg, clz);
+            return future.get();
         } catch (Exception e) {
-            logger.error("{}", msg, e);
-        } finally{
+            logger.error("", msg, e);
         }
         return null;
     }
-    public <T> Future<T> writeAsync(DefaultMessage msg, IResultHandler<T> handler){
+
+    public <T> Future<T> writeAsync(DefaultMessage msg, Class<T> clz) {
         try {
-            WriteFuture<T> future = new WriteFuture<>(handler);
-            addFuture(msg.getCmdId(), future);
+            ProtocolWriteFuture<T> future = factory.newProtocolWriteFuture(clz);
+            int cmd = ProtocolManager.getId(clz);
+            addFuture(cmd, future);
             write0(msg);
             return future;
         } catch (Exception e) {
@@ -129,14 +149,15 @@ public class SyncTcpConnection {
         }
         return null;
     }
+
     private void write0(DefaultMessage msg){
         if(channel != null){
             channel.writeAndFlush(msg);
         }
     }
 
-    private WriteFuture<?> addFuture(int cmd, WriteFuture<?> future) {
-        List<WriteFuture<?>> list = requests.get(cmd);
+    private BaseWriteFuture<?> addFuture(int cmd, BaseWriteFuture<?> future) {
+        List<BaseWriteFuture<?>> list = requests.get(cmd);
         if (list == null) {
             list = new LinkedList<>();
             requests.put(cmd, list);
@@ -145,8 +166,8 @@ public class SyncTcpConnection {
         return future;
     }
 
-    private WriteFuture<?> removeFuture(int cmd) {
-        List<WriteFuture<?>> list = requests.get(cmd);
+    private BaseWriteFuture<?> removeFuture(int cmd) {
+        List<BaseWriteFuture<?>> list = requests.get(cmd);
         if (list == null || list.isEmpty()) {
             return null;
         }
@@ -157,7 +178,7 @@ public class SyncTcpConnection {
     private class CytxHandler extends ChannelInboundHandlerAdapter{
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
-            logger.error("session created. " + ctx.channel().remoteAddress());
+            logger.info("session created. " + ctx.channel().remoteAddress());
             connectFuture.setResult(true);
         }
 
@@ -172,7 +193,7 @@ public class SyncTcpConnection {
             logger.debug("message recieved. " + ctx.channel().remoteAddress());
             DefaultMessage message = (DefaultMessage) msg;
 
-            WriteFuture<?> future = removeFuture(message.getCmdId());
+            BaseWriteFuture<?> future = removeFuture(message.getCmdId());
             if (future != null) {
                 future.setResponse(message);
             } else {
@@ -191,10 +212,10 @@ public class SyncTcpConnection {
 
         @Override
         public void run() {
-            for (Map.Entry<Integer, List<WriteFuture<?>>> entry : requests.entrySet()) {
-                List<WriteFuture<?>> list = entry.getValue();
+            for (Map.Entry<Integer, List<BaseWriteFuture<?>>> entry : requests.entrySet()) {
+                List<BaseWriteFuture<?>> list = entry.getValue();
                 if (list != null) {
-                    for (WriteFuture<?> f : list) {
+                    for (BaseWriteFuture<?> f : list) {
                         if (f.isExpired(DEFAULT_TIME_OUT)) {
                             list.remove(f);
                         }
