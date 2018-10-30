@@ -1,5 +1,6 @@
-package network.client;
+package network.client.future;
 
+import network.client.IResultHandler;
 import network.protocol.DefaultMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

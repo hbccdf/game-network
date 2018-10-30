@@ -1,4 +1,4 @@
-package network.client;
+package network.client.future;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;

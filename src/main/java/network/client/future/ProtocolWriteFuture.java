@@ -1,4 +1,4 @@
-package network.client;
+package network.client.future;
 
 public abstract class ProtocolWriteFuture<T> extends BaseWriteFuture<T> {
     protected Class<T> clz;

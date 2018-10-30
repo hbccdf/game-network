@@ -1,4 +1,4 @@
-package network.client;
+package network.client.future;
 
 import network.protocol.DefaultMessage;
 
@@ -27,7 +27,7 @@ public abstract class BaseWriteFuture<T> extends BaseFuture<T> {
         return handle(response);
     }
 
-    protected void setResponse(DefaultMessage response) {
+    public void setResponse(DefaultMessage response) {
         this.response = response;
         complete();
     }
