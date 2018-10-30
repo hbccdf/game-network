@@ -72,8 +72,10 @@ public class SyncTcpConnection {
                 .option(ChannelOption.SO_KEEPALIVE, true);
 
         // Start the connection attempt.
-        channel = b.connect(ip, port).sync().channel();
         bootstrap = b;
+        ChannelFuture f = b.connect(ip, port);
+        channel = f.channel();
+        f.sync();
 
         connectFuture = new ConnectFuture();
         return true;
@@ -87,14 +89,21 @@ public class SyncTcpConnection {
         return connectFuture;
     }
 
-    public void close() throws Exception{
-        if(channel != null){
-            channel.close().sync();
-            channel = null;
-        }
-        if(bootstrap != null){
-            bootstrap.config().group().shutdownGracefully();
-            bootstrap = null;
+    public void close(){
+        try {
+            if (connectFuture != null) {
+                connectFuture.setResult(false);
+            }
+            if (channel != null) {
+                channel.close().sync();
+                channel = null;
+            }
+            if (bootstrap != null) {
+                bootstrap.config().group().shutdownGracefully();
+                bootstrap = null;
+            }
+        } catch (Exception e) {
+            logger.error("close error", e);
         }
     }
 
