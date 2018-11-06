@@ -118,27 +118,13 @@ public class SyncTcpConnection {
         return false;
     }
 
-//    public <T> T write(DefaultMessage msg, IResultHandler<T> handler){
-//        try {
-//            Future<T> future = writeAsync(msg, handler);
-//            return future.get(DEFAULT_TIME_OUT, TimeUnit.MILLISECONDS);
-//        } catch (Exception e) {
-//            logger.error("{}", msg, e);
-//        } finally{
-//        }
-//        return null;
-//    }
-//    public <T> Future<T> writeAsync(DefaultMessage msg, IResultHandler<T> handler){
-//        try {
-//            WriteFuture<T> future = new WriteFuture<>(handler);
-//            addFuture(msg.getCmdId(), future);
-//            write0(msg);
-//            return future;
-//        } catch (Exception e) {
-//            logger.error("", msg, e);
-//        }
-//        return null;
-//    }
+    public void send(DefaultMessage msg) {
+        try {
+            write0(msg);
+        } catch (Exception e) {
+            logger.error("{}", msg, e);
+        }
+    }
 
     public <T> T write(DefaultMessage msg, Class<T> clz) {
         try {
@@ -158,7 +144,7 @@ public class SyncTcpConnection {
             write0(msg);
             return future;
         } catch (Exception e) {
-            logger.error("", msg, e);
+            logger.error("{}", msg, e);
         }
         return null;
     }
