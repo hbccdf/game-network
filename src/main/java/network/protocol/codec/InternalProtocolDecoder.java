@@ -9,7 +9,7 @@ import java.nio.ByteOrder;
 
 public class InternalProtocolDecoder extends AbstractProtocolDecoder<InternalMessage> {
     private static final int HEADER_LENGTH = 24;
-    private ByteOrder order = ByteOrder.LITTLE_ENDIAN;
+    private final ByteOrder order = ByteOrder.LITTLE_ENDIAN;
 
     @Override
     public InternalMessage decode(ChannelHandlerContext ctx, ByteBuf in) {

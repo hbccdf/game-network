@@ -12,10 +12,10 @@ import network.protocol.codec.CytxFrameEncoder;
 import network.protocol.codec.IProtocolCodecFactory;
 
 public class TcpConnection<T> {
-    private String ip;
-    private int port;
-    private IProtocolCodecFactory<T> codecFactory;
-    private IProtocolHandler<T> handler;
+    private final String ip;
+    private final int port;
+    private final IProtocolCodecFactory<T> codecFactory;
+    private final IProtocolHandler<T> handler;
 
     private Bootstrap bootstrap;
     private Channel channel;

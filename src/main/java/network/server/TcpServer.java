@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TcpServer<T> {
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(TcpServer.class);
     private int port;
     private IProtocolCodecFactory<T> codecFactory;
     private IProtocolHandler<T> handler;
@@ -50,8 +50,8 @@ public class TcpServer<T> {
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline p = ch.pipeline();
                             p.addLast(new CytxFrameEncoder(codecFactory.getEncoder(ch)));
-                            p.addLast(new CytxFrameDecoder<T>(codecFactory.getDecoder(ch)));
-                            p.addLast(new CytxHandler<T>(handler));
+                            p.addLast(new CytxFrameDecoder<>(codecFactory.getDecoder(ch)));
+                            p.addLast(new CytxHandler<>(handler));
                         }
                     })
                     .option(ChannelOption.SO_REUSEADDR, true)

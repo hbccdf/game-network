@@ -8,9 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MultiThreadProtocolHandler<T> implements IProtocolHandler<T> {
-    private Logger logger = LoggerFactory.getLogger(MultiThreadProtocolHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(MultiThreadProtocolHandler.class);
     private IProtocolHandler<T> handler;
-    private IEventExecutorChooserFactory chooserFacotry;
     private IEventExecutorChooser chooser;
     private EventExecutorGroup group;
 
@@ -31,9 +30,8 @@ public class MultiThreadProtocolHandler<T> implements IProtocolHandler<T> {
     public MultiThreadProtocolHandler(IProtocolHandler<T> handler, EventExecutorGroup group, IEventExecutorChooserFactory chooserFactory) {
         super();
         this.handler = handler;
-        this.chooserFacotry = chooserFactory;
         this.group = group;
-        this.chooser = this.chooserFacotry.newChooser(this.group);
+        this.chooser = chooserFactory.newChooser(this.group);
     }
 
     @Override

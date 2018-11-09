@@ -7,14 +7,14 @@ import java.net.InetSocketAddress;
 import java.util.Date;
 
 public class NioSocketSession implements ISession {
-    private int connId;
+    private final int connId;
     private int userId;
     private Date loginTime;
-    private Channel channel;
-    private Date createTime;
+    private final Channel channel;
+    private final Date createTime;
     private long lastRecvTime = System.currentTimeMillis();
-    long recvBytes = 0;
-    long sendBytes = 0;
+    private long recvBytes = 0;
+    private long sendBytes = 0;
 
     public NioSocketSession(Channel channel, int connId) {
         this.channel = channel;

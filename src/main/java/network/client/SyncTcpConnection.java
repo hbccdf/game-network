@@ -28,13 +28,13 @@ import java.util.concurrent.TimeUnit;
 public class SyncTcpConnection {
     private static final Logger logger = LoggerFactory.getLogger(SyncTcpConnection.class);
 
-    private String ip;
-    private int port;
-    private IProtocolWriteFutureFactory factory;
+    private final String ip;
+    private final int port;
+    private final IProtocolWriteFutureFactory factory;
 
     //ms
     private static final int DEFAULT_TIME_OUT = 60000;
-    private ConcurrentHashMap<Integer, List<BaseWriteFuture<?>>> requests;
+    private final ConcurrentHashMap<Integer, List<BaseWriteFuture<?>>> requests;
     private Bootstrap bootstrap;
     private Channel channel;
 
@@ -82,7 +82,7 @@ public class SyncTcpConnection {
     }
 
     public boolean connect() throws InterruptedException {
-        return connectAsync().get().booleanValue();
+        return connectAsync().get();
     }
 
     public ConnectFuture connectAsync() {
@@ -156,11 +156,7 @@ public class SyncTcpConnection {
     }
 
     private BaseWriteFuture<?> addFuture(int cmd, BaseWriteFuture<?> future) {
-        List<BaseWriteFuture<?>> list = requests.get(cmd);
-        if (list == null) {
-            list = new LinkedList<>();
-            requests.put(cmd, list);
-        }
+        List<BaseWriteFuture<?>> list = requests.computeIfAbsent(cmd, k -> new LinkedList<>());
         list.add(future);
         return future;
     }
@@ -189,7 +185,7 @@ public class SyncTcpConnection {
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            logger.debug("message recieved. " + ctx.channel().remoteAddress());
+            logger.debug("message received. " + ctx.channel().remoteAddress());
             DefaultMessage message = (DefaultMessage) msg;
 
             BaseWriteFuture<?> future = removeFuture(message.getCmdId());

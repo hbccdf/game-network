@@ -5,7 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
 public class CytxFrameEncoder extends MessageToByteEncoder<Object> {
-    private IProtocolEncoder encoder;
+    private final IProtocolEncoder encoder;
 
     public CytxFrameEncoder(IProtocolEncoder encoder) {
         super();

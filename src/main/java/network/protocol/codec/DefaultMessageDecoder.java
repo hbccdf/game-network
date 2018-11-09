@@ -24,7 +24,6 @@ public class DefaultMessageDecoder extends AbstractProtocolDecoder<DefaultMessag
 
         byte[] dst = new byte[len];
         in.readBytes(dst);
-        DefaultMessage msg = new DefaultMessage(cmdId, dst);
-        return msg;
+        return new DefaultMessage(cmdId, dst);
     }
 }

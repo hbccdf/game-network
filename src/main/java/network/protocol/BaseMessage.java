@@ -3,10 +3,10 @@ package network.protocol;
 import java.util.Arrays;
 
 public abstract class BaseMessage<T extends BaseMessageHeader> implements IMessage {
-    protected T header;
-    protected byte[] data;
+    final T header;
+    private byte[] data;
 
-    public BaseMessage(T header, byte[] data) {
+    BaseMessage(T header, byte[] data) {
         super();
         this.header = header;
         this.data = data;

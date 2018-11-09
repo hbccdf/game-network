@@ -6,7 +6,7 @@ import network.protocol.SimpleMessage;
 public class SimpleProtocolEncoder implements IProtocolEncoder {
     @Override
     public void encode(Object msg, ByteBuf out) {
-        if (msg == null || !(msg instanceof SimpleMessage)) {
+        if (!(msg instanceof SimpleMessage)) {
             return;
         }
 

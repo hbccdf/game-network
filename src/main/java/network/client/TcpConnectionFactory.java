@@ -7,10 +7,10 @@ import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 
 public class TcpConnectionFactory<T> extends BasePooledObjectFactory<TcpConnection<T>> {
-    private String ip;
-    private int port;
-    private IProtocolCodecFactory<T> codecFactory;
-    private IProtocolHandler<T> handler;
+    private final String ip;
+    private final int port;
+    private final IProtocolCodecFactory<T> codecFactory;
+    private final IProtocolHandler<T> handler;
 
     public TcpConnectionFactory(String ip, int port, IProtocolCodecFactory<T> codecFactory, IProtocolHandler<T> handler) {
         this.ip = ip;
@@ -21,7 +21,7 @@ public class TcpConnectionFactory<T> extends BasePooledObjectFactory<TcpConnecti
 
     @Override
     public TcpConnection<T> create() throws Exception {
-        TcpConnection<T> conn = new TcpConnection<T>(ip, port, codecFactory, handler);
+        TcpConnection<T> conn = new TcpConnection<>(ip, port, codecFactory, handler);
         conn.connect();
         return conn;
     }

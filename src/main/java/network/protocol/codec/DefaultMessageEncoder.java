@@ -6,7 +6,7 @@ import network.protocol.DefaultMessage;
 public class DefaultMessageEncoder implements IProtocolEncoder {
     @Override
     public void encode(Object obj, ByteBuf out) {
-        if (obj == null || !(obj instanceof DefaultMessage)) {
+        if (!(obj instanceof DefaultMessage)) {
             return;
         }
 

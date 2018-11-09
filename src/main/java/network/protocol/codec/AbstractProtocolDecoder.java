@@ -14,5 +14,5 @@ public abstract class AbstractProtocolDecoder<T> implements IProtocolDecoder<T> 
         }
     }
 
-    public abstract T decode(ChannelHandlerContext ctx, ByteBuf in);
+    protected abstract T decode(ChannelHandlerContext ctx, ByteBuf in);
 }

@@ -5,16 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class NioSessionManager implements ISessionManager {
-    private static Logger logger = LoggerFactory.getLogger(NioSessionManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(NioSessionManager.class);
 
-    private ConcurrentHashMap<Integer, ISession> idToSessionMap = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<ChannelId, ISession> channelIdToSessionMap = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<Integer, ISession> userIdToSessionMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, ISession> idToSessionMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<ChannelId, ISession> channelIdToSessionMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, ISession> userIdToSessionMap = new ConcurrentHashMap<>();
 
     @Override
     public ISession getSession(int sessionId) {

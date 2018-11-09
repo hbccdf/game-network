@@ -5,10 +5,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public abstract class BaseFuture<T> implements Future<T> {
-    protected long createTime = System.currentTimeMillis();
-    protected boolean isDone = false;
+    private final long createTime = System.currentTimeMillis();
+    private boolean isDone = false;
 
-    protected final Object lock = new Object();
+    private final Object lock = new Object();
 
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
@@ -25,7 +25,7 @@ public abstract class BaseFuture<T> implements Future<T> {
         return isDone;
     }
 
-    public void wait(long timeout, TimeUnit unit)  throws InterruptedException, TimeoutException {
+    void wait(long timeout, TimeUnit unit)  throws InterruptedException, TimeoutException {
         if (!isDone) {
             synchronized (lock) {
                 try {
@@ -42,7 +42,7 @@ public abstract class BaseFuture<T> implements Future<T> {
         }
     }
 
-    public void complete() {
+    void complete() {
         synchronized (lock) {
             isDone = true;
             lock.notifyAll();

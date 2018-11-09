@@ -1,7 +1,7 @@
 package network.client.future;
 
 public abstract class ProtocolWriteFuture<T> extends BaseWriteFuture<T> {
-    protected Class<T> clz;
+    protected final Class<T> clz;
 
     public ProtocolWriteFuture(Class<T> clz) {
         this.clz = clz;

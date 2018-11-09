@@ -24,8 +24,6 @@ public class SimpleProtocolDecoder extends AbstractProtocolDecoder<SimpleMessage
         byte[] dst = new byte[len];
         in.readBytes(dst);
 
-        SimpleMessage msg = new SimpleMessage(cmdId, dst);
-        return msg;
-
+        return new SimpleMessage(cmdId, dst);
     }
 }

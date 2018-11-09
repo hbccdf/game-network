@@ -10,26 +10,6 @@ public class DefaultMessage extends BaseMessage<DefaultMessageHeader> {
     }
 
     @Override
-    public int getCmdId() {
-        return super.getCmdId();
-    }
-
-    @Override
-    public void setCmdId(int id) {
-        super.setCmdId(id);
-    }
-
-    @Override
-    public byte[] getData() {
-        return super.getData();
-    }
-
-    @Override
-    public void setData(byte[] data) {
-        super.setData(data);
-    }
-
-    @Override
     public String toString() {
         return String.format("defaultMsg[cmd=%d, len=%d]", getCmdId(), getData().length);
     }

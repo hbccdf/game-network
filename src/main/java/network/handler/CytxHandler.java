@@ -4,7 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 public class CytxHandler<T> extends ChannelInboundHandlerAdapter {
-    private IProtocolHandler<T> handler;
+    private final IProtocolHandler<T> handler;
 
     public CytxHandler(IProtocolHandler<T> handler) {
         super();

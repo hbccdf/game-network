@@ -7,10 +7,10 @@ import network.util.NetworkUtil;
 import java.nio.ByteOrder;
 
 public class InternalProtocolEncoder implements IProtocolEncoder {
-    private ByteOrder order = ByteOrder.LITTLE_ENDIAN;
+    private final ByteOrder order = ByteOrder.LITTLE_ENDIAN;
     @Override
     public void encode(Object obj, ByteBuf out) {
-        if (obj == null || !(obj instanceof InternalMessage)) {
+        if (!(obj instanceof InternalMessage)) {
             return;
         }
 

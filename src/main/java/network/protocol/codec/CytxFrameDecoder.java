@@ -7,7 +7,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import java.util.List;
 
 public class CytxFrameDecoder<T> extends ByteToMessageDecoder {
-    private IProtocolDecoder<T> decoder;
+    private final IProtocolDecoder<T> decoder;
 
     public CytxFrameDecoder(IProtocolDecoder<T> decoder) {
         super();
