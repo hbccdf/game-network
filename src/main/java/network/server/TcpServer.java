@@ -42,21 +42,24 @@ public class TcpServer<T> {
             try {
                 ServerBootstrap b = new ServerBootstrap();
                 b.group(bossGroup, workGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .option(ChannelOption.SO_BACKLOG, 128)
-                    .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            ChannelPipeline p = ch.pipeline();
-                            p.addLast(new CytxFrameEncoder(codecFactory.getEncoder(ch)));
-                            p.addLast(new CytxFrameDecoder<>(codecFactory.getDecoder(ch)));
-                            p.addLast(new CytxHandler<>(handler));
-                        }
-                    })
-                    .option(ChannelOption.SO_REUSEADDR, true)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true)
-                    .childOption(ChannelOption.TCP_NODELAY, true);
+                        .channel(NioServerSocketChannel.class)
+                        .option(ChannelOption.SO_BACKLOG, 128)
+                        .handler(new LoggingHandler(LogLevel.INFO))
+                        .childHandler(new ChannelInitializer<SocketChannel>() {
+                            @Override
+                            protected void initChannel(SocketChannel ch) throws Exception {
+                                ChannelPipeline p = ch.pipeline();
+                                p.addLast(new CytxFrameEncoder(codecFactory.getEncoder(ch)));
+                                p.addLast(new CytxFrameDecoder<>(codecFactory.getDecoder(ch)));
+                                p.addLast(new CytxHandler<>(handler));
+                            }
+                        })
+                        .option(ChannelOption.SO_REUSEADDR, true)
+                        .childOption(ChannelOption.SO_KEEPALIVE, true)
+                        .childOption(ChannelOption.TCP_NODELAY, true)
+                        .childOption(ChannelOption.SO_RCVBUF, 128 * 1024)
+                        .childOption(ChannelOption.SO_SNDBUF, 128 * 1024);
+
 
                 ChannelFuture f = b.bind(port).sync();
                 channel = f.channel();
