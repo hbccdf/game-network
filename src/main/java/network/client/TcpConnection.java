@@ -2,9 +2,8 @@ package network.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
+import network.core.BootstrapHelper;
 import network.handler.CytxHandler;
 import network.handler.IProtocolHandler;
 import network.protocol.codec.CytxFrameDecoder;
@@ -32,10 +31,9 @@ public class TcpConnection<T> {
             return false;
         }
 
-        EventLoopGroup group = new NioEventLoopGroup();
         Bootstrap b = new Bootstrap();
-        b.group(group)
-                .channel(NioSocketChannel.class)
+        b.group(BootstrapHelper.getClientGroup(1))
+                .channel(BootstrapHelper.getClientChannelClass())
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {

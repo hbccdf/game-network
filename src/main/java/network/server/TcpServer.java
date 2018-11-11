@@ -2,11 +2,10 @@ package network.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import network.core.BootstrapHelper;
 import network.handler.CytxHandler;
 import network.handler.IProtocolHandler;
 import network.protocol.codec.CytxFrameDecoder;
@@ -37,12 +36,12 @@ public class TcpServer<T> {
 
     public void start() throws Exception{
         new Thread(()->{
-            EventLoopGroup bossGroup = new NioEventLoopGroup(4);
-            EventLoopGroup workGroup = new NioEventLoopGroup(nThreads);
+            EventLoopGroup bossGroup = BootstrapHelper.getBossGroup(1);
+            EventLoopGroup workGroup = BootstrapHelper.getWorkerGroup(nThreads);
             try {
                 ServerBootstrap b = new ServerBootstrap();
                 b.group(bossGroup, workGroup)
-                        .channel(NioServerSocketChannel.class)
+                        .channel(BootstrapHelper.getServerChannelClass())
                         .option(ChannelOption.SO_BACKLOG, 128)
                         .handler(new LoggingHandler(LogLevel.INFO))
                         .childHandler(new ChannelInitializer<SocketChannel>() {

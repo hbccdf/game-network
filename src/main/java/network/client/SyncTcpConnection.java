@@ -2,14 +2,13 @@ package network.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import network.client.future.BaseWriteFuture;
 import network.client.future.ConnectFuture;
 import network.client.future.IProtocolWriteFutureFactory;
 import network.client.future.ProtocolWriteFuture;
+import network.core.BootstrapHelper;
 import network.protocol.DefaultMessage;
 import network.protocol.ProtocolManager;
 import network.protocol.codec.CytxFrameDecoder;
@@ -54,10 +53,9 @@ public class SyncTcpConnection {
             return false;
         }
 
-        EventLoopGroup group = new NioEventLoopGroup();
-        io.netty.bootstrap.Bootstrap b = new io.netty.bootstrap.Bootstrap();
-        b.group(group)
-                .channel(NioSocketChannel.class)
+        Bootstrap b = new Bootstrap();
+        b.group(BootstrapHelper.getClientGroup(1))
+                .channel(BootstrapHelper.getClientChannelClass())
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
