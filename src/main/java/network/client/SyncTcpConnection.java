@@ -2,18 +2,15 @@ package network.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import network.client.future.BaseWriteFuture;
 import network.client.future.ConnectFuture;
 import network.client.future.IProtocolWriteFutureFactory;
 import network.client.future.ProtocolWriteFuture;
 import network.core.BootstrapHelper;
+import network.handler.IProtocolHandler;
+import network.initializer.DefaultProtocolInitializer;
 import network.protocol.DefaultMessage;
 import network.protocol.ProtocolManager;
-import network.protocol.codec.CytxFrameDecoder;
-import network.protocol.codec.CytxFrameEncoder;
-import network.protocol.codec.DefaultMessageCodecFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,13 +24,13 @@ import java.util.concurrent.TimeUnit;
 public class SyncTcpConnection {
     private static final Logger logger = LoggerFactory.getLogger(SyncTcpConnection.class);
 
+    private static final int DEFAULT_TIME_OUT = 60000;
+
     private final String ip;
     private final int port;
     private final IProtocolWriteFutureFactory factory;
 
-    //ms
-    private static final int DEFAULT_TIME_OUT = 60000;
-    private final ConcurrentHashMap<Integer, List<BaseWriteFuture<?>>> requests;
+    private final ConcurrentHashMap<Integer, List<BaseWriteFuture<?>>> requests = new ConcurrentHashMap<>();
     private Bootstrap bootstrap;
     private Channel channel;
 
@@ -43,7 +40,6 @@ public class SyncTcpConnection {
         this.ip = ip;
         this.port = port;
         this.factory = factory;
-        requests = new ConcurrentHashMap<>();
     }
 
     public boolean start() throws Exception{
@@ -54,20 +50,11 @@ public class SyncTcpConnection {
         Bootstrap b = new Bootstrap();
         b.group(BootstrapHelper.getClientGroup(1))
                 .channel(BootstrapHelper.getClientChannelClass())
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    public void initChannel(SocketChannel ch) throws Exception {
-                        ChannelPipeline p = ch.pipeline();
-                        p.addLast(new CytxFrameEncoder(DefaultMessageCodecFactory.INSTANCE.getEncoder(ch)));
-                        p.addLast(new CytxFrameDecoder<>(DefaultMessageCodecFactory.INSTANCE.getDecoder(ch)));
-                        p.addLast(new CytxHandler());
-                    }
-                })
+                .handler(new DefaultProtocolInitializer(new CytxHandler()))
                 .option(ChannelOption.TCP_NODELAY, true)
                 .option(ChannelOption.SO_REUSEADDR, true)
                 .option(ChannelOption.SO_KEEPALIVE, true);
 
-        // Start the connection attempt.
         bootstrap = b;
         ChannelFuture f = b.connect(ip, port);
         channel = f.channel();
@@ -169,35 +156,40 @@ public class SyncTcpConnection {
     }
 
 
-    private class CytxHandler extends ChannelInboundHandlerAdapter{
+    private class CytxHandler implements IProtocolHandler<DefaultMessage> {
+
         @Override
-        public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        public void sessionOpened(ChannelHandlerContext ctx) {
             logger.info("session created. " + ctx.channel().remoteAddress());
             connectFuture.setResult(true);
         }
 
         @Override
-        public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        public void sessionClosed(ChannelHandlerContext ctx) {
             logger.error("session closed. " + ctx.channel().remoteAddress());
             connectFuture.setResult(false);
         }
 
         @Override
-        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        public void messageReceived(ChannelHandlerContext ctx, DefaultMessage msg) {
             logger.debug("message received. " + ctx.channel().remoteAddress());
-            DefaultMessage message = (DefaultMessage) msg;
 
-            BaseWriteFuture<?> future = removeFuture(message.getCmdId());
+            BaseWriteFuture<?> future = removeFuture(msg.getCmdId());
             if (future != null) {
-                future.setResponse(message);
+                future.setResponse(msg);
             } else {
                 //todo using protocol handler to process this message
             }
         }
 
         @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-            logger.error("exception caught. " + ctx.channel().remoteAddress(), cause);
+        public void release() {
+
+        }
+
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+            logger.error("exception caught: {}", ctx.channel().remoteAddress(), cause);
         }
     }
 
