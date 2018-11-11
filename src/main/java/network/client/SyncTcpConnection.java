@@ -44,8 +44,6 @@ public class SyncTcpConnection {
         this.port = port;
         this.factory = factory;
         requests = new ConcurrentHashMap<>();
-
-        new DefaultEventExecutorGroup(1).next().scheduleAtFixedRate(new ClearExpiredFuture(), 0, 1, TimeUnit.MINUTES);
     }
 
     public boolean start() throws Exception{
@@ -73,6 +71,9 @@ public class SyncTcpConnection {
         bootstrap = b;
         ChannelFuture f = b.connect(ip, port);
         channel = f.channel();
+
+        channel.eventLoop().scheduleAtFixedRate(new ClearExpiredFuture(), 0, 1, TimeUnit.MINUTES);
+
         f.sync();
 
         connectFuture = new ConnectFuture();
