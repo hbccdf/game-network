@@ -1,4 +1,4 @@
-package network.protocol;
+package network.protocol.manager;
 
 import java.util.HashMap;
 

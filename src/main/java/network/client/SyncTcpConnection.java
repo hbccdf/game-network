@@ -10,7 +10,7 @@ import network.core.BootstrapHelper;
 import network.handler.IProtocolHandler;
 import network.initializer.DefaultProtocolInitializer;
 import network.protocol.DefaultMessage;
-import network.protocol.ProtocolManager;
+import network.protocol.manager.ProtocolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +29,7 @@ public class SyncTcpConnection {
     private final String ip;
     private final int port;
     private final IProtocolWriteFutureFactory factory;
+    private final IHandler<DefaultMessage> handler;
 
     private final ConcurrentHashMap<Integer, List<BaseWriteFuture<?>>> requests = new ConcurrentHashMap<>();
     private Bootstrap bootstrap;
@@ -37,9 +38,14 @@ public class SyncTcpConnection {
     private ConnectFuture connectFuture;
 
     public SyncTcpConnection(String ip, int port, IProtocolWriteFutureFactory factory) {
+        this(ip, port, factory, null);
+    }
+
+    public SyncTcpConnection(String ip, int port, IProtocolWriteFutureFactory factory, IHandler<DefaultMessage> handler) {
         this.ip = ip;
         this.port = port;
         this.factory = factory;
+        this.handler = handler;
     }
 
     public boolean start() throws Exception{
@@ -172,13 +178,15 @@ public class SyncTcpConnection {
 
         @Override
         public void messageReceived(ChannelHandlerContext ctx, DefaultMessage msg) {
-            logger.debug("message received. " + ctx.channel().remoteAddress());
+            logger.trace("message received. " + ctx.channel().remoteAddress());
 
             BaseWriteFuture<?> future = removeFuture(msg.getCmdId());
             if (future != null) {
                 future.setResponse(msg);
+            } else if (handler != null) {
+                handler.handle(msg);
             } else {
-                //todo using protocol handler to process this message
+                logger.debug("message {} no handler", msg.getCmdId());
             }
         }
 
