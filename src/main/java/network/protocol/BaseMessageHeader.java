@@ -1,8 +1,6 @@
 package network.protocol;
 
 public abstract class BaseMessageHeader {
-    protected short resultCode;
-    protected short reverseField;
     protected int cmdId;
 
     public abstract int getLength();

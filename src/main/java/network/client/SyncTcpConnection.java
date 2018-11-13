@@ -2,6 +2,7 @@ package network.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
+import lombok.extern.slf4j.Slf4j;
 import network.client.future.BaseWriteFuture;
 import network.client.future.ConnectFuture;
 import network.client.future.IProtocolWriteFutureFactory;
@@ -11,8 +12,6 @@ import network.handler.IProtocolHandler;
 import network.initializer.DefaultProtocolInitializer;
 import network.protocol.DefaultMessage;
 import network.protocol.manager.ProtocolManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -21,9 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class SyncTcpConnection {
-    private static final Logger logger = LoggerFactory.getLogger(SyncTcpConnection.class);
-
     private static final int DEFAULT_TIME_OUT = 60000;
 
     private final String ip;
@@ -32,9 +30,9 @@ public class SyncTcpConnection {
     private final IHandler<DefaultMessage> handler;
 
     private final ConcurrentHashMap<Integer, List<BaseWriteFuture<?>>> requests = new ConcurrentHashMap<>();
+
     private Bootstrap bootstrap;
     private Channel channel;
-
     private ConnectFuture connectFuture;
 
     public SyncTcpConnection(String ip, int port, IProtocolWriteFutureFactory factory) {
@@ -95,7 +93,7 @@ public class SyncTcpConnection {
                 bootstrap = null;
             }
         } catch (Exception e) {
-            logger.error("close error", e);
+            log.error("close error", e);
         }
     }
 
@@ -114,7 +112,7 @@ public class SyncTcpConnection {
         try {
             write0(msg);
         } catch (Exception e) {
-            logger.error("{}", msg, e);
+            log.error("{}", msg, e);
         }
     }
 
@@ -123,7 +121,7 @@ public class SyncTcpConnection {
             Future<T> future = writeAsync(msg, clz);
             return future.get();
         } catch (Exception e) {
-            logger.error("", msg, e);
+            log.error("", msg, e);
         }
         return null;
     }
@@ -136,7 +134,7 @@ public class SyncTcpConnection {
             write0(msg);
             return future;
         } catch (Exception e) {
-            logger.error("{}", msg, e);
+            log.error("{}", msg, e);
         }
         return null;
     }
@@ -166,19 +164,19 @@ public class SyncTcpConnection {
 
         @Override
         public void sessionOpened(ChannelHandlerContext ctx) {
-            logger.info("session created. " + ctx.channel().remoteAddress());
+            log.info("session created. " + ctx.channel().remoteAddress());
             connectFuture.setResult(true);
         }
 
         @Override
         public void sessionClosed(ChannelHandlerContext ctx) {
-            logger.error("session closed. " + ctx.channel().remoteAddress());
+            log.error("session closed. " + ctx.channel().remoteAddress());
             connectFuture.setResult(false);
         }
 
         @Override
         public void messageReceived(ChannelHandlerContext ctx, DefaultMessage msg) {
-            logger.trace("message received. " + ctx.channel().remoteAddress());
+            log.trace("message received. " + ctx.channel().remoteAddress());
 
             BaseWriteFuture<?> future = removeFuture(msg.getCmdId());
             if (future != null) {
@@ -186,7 +184,7 @@ public class SyncTcpConnection {
             } else if (handler != null) {
                 handler.handle(msg);
             } else {
-                logger.debug("message {} no handler", msg.getCmdId());
+                log.debug("message {} no handler", msg.getCmdId());
             }
         }
 
@@ -197,7 +195,7 @@ public class SyncTcpConnection {
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-            logger.error("exception caught: {}", ctx.channel().remoteAddress(), cause);
+            log.error("exception caught: {}", ctx.channel().remoteAddress(), cause);
         }
     }
 

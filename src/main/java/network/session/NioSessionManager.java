@@ -1,15 +1,13 @@
 package network.session;
 
 import io.netty.channel.ChannelId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 public class NioSessionManager implements ISessionManager {
-    private static final Logger logger = LoggerFactory.getLogger(NioSessionManager.class);
-
     private final ConcurrentHashMap<Integer, ISession> idToSessionMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<ChannelId, ISession> channelIdToSessionMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, ISession> userIdToSessionMap = new ConcurrentHashMap<>();
@@ -34,7 +32,7 @@ public class NioSessionManager implements ISessionManager {
         if (session != null) {
             idToSessionMap.put(session.getId(), session);
             channelIdToSessionMap.put((ChannelId) session.getChannelId(), session);
-            logger.info("add session {}, current session count {}", session.getId(), idToSessionMap.size());
+            log.info("add session {}, current session count {}", session.getId(), idToSessionMap.size());
         }
     }
 
@@ -46,7 +44,7 @@ public class NioSessionManager implements ISessionManager {
             int userId = session.logout();
             userIdToSessionMap.remove(userId);
         }
-        logger.info("remove session {}, result {}, current session count {}", sessionId, session != null, idToSessionMap.size());
+        log.info("remove session {}, result {}, current session count {}", sessionId, session != null, idToSessionMap.size());
     }
 
     @Override

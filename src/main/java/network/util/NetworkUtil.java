@@ -1,13 +1,6 @@
 package network.util;
 
 public class NetworkUtil {
-    public static int parseInt(Object source, int defaultValue){
-        try {
-            return Integer.parseInt((String) source);
-        } catch (NumberFormatException e) {
-        }
-        return defaultValue;
-    }
     public static int reverseEndian(int value){
         int tmp;
         tmp = (value << 24) | ((value << 8) & 0xFF0000) | ((value >> 8) & 0xFF00) | ((value >> 24) & 0xFF);

@@ -5,12 +5,11 @@ import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import lombok.extern.slf4j.Slf4j;
 import network.core.BootstrapHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@Slf4j
 public class TcpServer {
-    private static final Logger logger = LoggerFactory.getLogger(TcpServer.class);
     private final int port;
     private final int nThreads;
     private final ChannelInitializer<SocketChannel> initializer;
@@ -50,7 +49,7 @@ public class TcpServer {
             channel = f.channel();
 
         } catch (Exception e){
-            logger.error("fail listen port: {}", port, e);
+            log.error("fail listen port: {}", port, e);
         }
     }
 

@@ -26,6 +26,5 @@ public class NioSessionFactory implements ISessionFactory {
 
     @Override
     public void releaseSession(ISession session) {
-        //do nothing
     }
 }

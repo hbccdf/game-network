@@ -4,14 +4,13 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.EventExecutorGroup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class MultiThreadProtocolHandler<T> implements IProtocolHandler<T> {
-    private static final Logger logger = LoggerFactory.getLogger(MultiThreadProtocolHandler.class);
-    private IProtocolHandler<T> handler;
-    private IEventExecutorChooser chooser;
-    private EventExecutorGroup group;
+    private final IProtocolHandler<T> handler;
+    private final IEventExecutorChooser chooser;
+    private final EventExecutorGroup group;
 
     private static final int DEFAULT_EVENT_LOOP_THREADS;
 
@@ -48,7 +47,7 @@ public class MultiThreadProtocolHandler<T> implements IProtocolHandler<T> {
     public void messageReceived(ChannelHandlerContext ctx, T msg) {
         EventExecutor executor = this.chooser.choose(msg);
         if(executor == null){
-            logger.error("can't choose executor, message={}", msg);
+            log.error("can't choose executor, message={}", msg);
         }else{
             executor.execute(()-> handler.messageReceived(ctx, msg));
         }
