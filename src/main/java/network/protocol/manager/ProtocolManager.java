@@ -11,11 +11,19 @@ public class ProtocolManager {
         idAndClassMap.put(protocolId, clz);
     }
 
-    public static Integer getId(Class<?> clz) {
+    public static int getId(Class<?> clz) {
         return classAndIdMap.get(clz);
     }
 
-    public static Class<?> getClass(Integer protocolId) {
+    public static Class<?> getClass(int protocolId) {
         return idAndClassMap.get(protocolId);
+    }
+
+    public static boolean contain(int protocolId) {
+        return idAndClassMap.containsKey(protocolId);
+    }
+
+    public static boolean contain(Class<?> clz) {
+        return classAndIdMap.containsKey(clz);
     }
 }
