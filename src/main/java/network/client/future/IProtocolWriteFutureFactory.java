@@ -1,5 +1,5 @@
 package network.client.future;
 
 public interface IProtocolWriteFutureFactory {
-    <T> ProtocolWriteFuture<T> newProtocolWriteFuture(Class<T> clz);
+    <T> BaseProtocolWriteFuture<T> newProtocolWriteFuture(Class<T> clz);
 }

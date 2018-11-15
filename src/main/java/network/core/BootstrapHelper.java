@@ -11,7 +11,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
 public class BootstrapHelper {
-    private static boolean isLinux;
+    private static final boolean isLinux;
     private static EventLoopGroup defaultGroup;
 
     static {

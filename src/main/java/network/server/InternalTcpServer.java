@@ -3,7 +3,6 @@ package network.server;
 import network.handler.IProtocolHandler;
 import network.initializer.InternalProtocolInitializer;
 import network.protocol.InternalMessage;
-import network.protocol.codec.InternalProtocolCodecFactory;
 
 public class InternalTcpServer extends TcpServer {
 

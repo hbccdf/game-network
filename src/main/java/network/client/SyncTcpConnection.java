@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import network.client.future.BaseWriteFuture;
 import network.client.future.ConnectFuture;
 import network.client.future.IProtocolWriteFutureFactory;
-import network.client.future.ProtocolWriteFuture;
+import network.client.future.BaseProtocolWriteFuture;
 import network.core.BootstrapHelper;
 import network.handler.IProtocolHandler;
 import network.initializer.DefaultProtocolInitializer;
@@ -128,7 +128,7 @@ public class SyncTcpConnection {
 
     public <T> Future<T> writeAsync(DefaultMessage msg, Class<T> clz) {
         try {
-            ProtocolWriteFuture<T> future = factory.newProtocolWriteFuture(clz);
+            BaseProtocolWriteFuture<T> future = factory.newProtocolWriteFuture(clz);
             int cmd = ProtocolManager.getId(clz);
             addFuture(cmd, future);
             write0(msg);
