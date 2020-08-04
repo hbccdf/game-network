@@ -1,2 +1,2 @@
 # game-network
-game-network
+game-network是一个通用的Tcp连接库，用于创建TcpServer和TcpClient，通过不同的Codec解析不同的数据包格式
